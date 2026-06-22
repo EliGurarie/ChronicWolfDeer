@@ -1,0 +1,36 @@
+Package: ChronicWolfDeer
+Title: Wolf-CWD SIP Meta-Population Model for Wisconsin White-Tailed Deer
+Version: 0.0.0.9000
+Authors@R:
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: A multi-compartment, sex-age structured, discrete-time
+    meta-population model that tracks white-tailed deer demography and
+    chronic wasting disease (CWD) prevalence across Wisconsin counties.
+    Each annual step applies density-dependent recruitment and survival
+    (Lefkovitch projection), frequency-dependent animal-to-animal
+    transmission (SIP: susceptible-infected-perished), and male-yearling
+    dispersal between counties. Survival integrates harvest, non-harvest,
+    and class-selective wolf predation. The package provides the core
+    one-step engine, an iterative simulator, tidy/sf output transformers,
+    and parameter-scale helpers for model fitting.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    dplyr,
+    magrittr,
+    purrr,
+    rlang,
+    sf,
+    stats,
+    stringr,
+    tidyr
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+LazyData: true
