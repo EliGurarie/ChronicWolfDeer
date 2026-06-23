@@ -26,8 +26,7 @@ step_SIP_matrix(
   W,
   n.wolf,
   p,
-  dnr_region,
-  M_distance,
+  dispersal_matrix,
   counties,
   classes = sip_classes
 )
@@ -49,12 +48,10 @@ each of the eight susceptible/infected x sex x age classes.}
 \item{W}{Wolf-presence flags. \code{n.wolf} Wolf abundances.}
 
 \item{p}{Raw-scale parameter list (\code{alpha}, \code{xi}, \code{eta}, \code{omega}, \code{theta_m},
-\code{theta_f}, \code{beta_mm}, \code{beta_mf}, \code{beta_ffy}, \code{kappa_NF_y}, \code{kappa_EF_y}).}
+\code{theta_f}, \code{beta_mm}, \code{beta_mf}, \code{beta_ffy}).}
 
-\item{dnr_region}{Region labels per county.}
-
-\item{M_distance}{Square county-by-county distance matrix, ordered to match
-\code{counties}.}
+\item{dispersal_matrix}{Row-stochastic county-by-county dispersal matrix from
+\code{\link[=calculate_prob_dispersal]{calculate_prob_dispersal()}}, ordered to match \code{counties}.}
 
 \item{counties}{County names giving the order of all vector arguments.}
 
@@ -68,5 +65,10 @@ Projects every county forward one year: (1) density-dependent recruitment and
 survival via a per-county Lefkovitch projection, (2) frequency-dependent CWD
 transmission, (3) dispersal of male yearlings between counties. All vector
 arguments are indexed by county and share the order given in \code{counties}.
+}
+\details{
+The dispersal kernel is constant across years, so it is built once by the
+caller (\code{\link[=run_SIP_matrix]{run_SIP_matrix()}}) and passed in via \code{dispersal_matrix} rather than
+rebuilt every step.
 }
 \keyword{internal}

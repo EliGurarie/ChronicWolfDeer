@@ -40,12 +40,10 @@ library(ChronicWolfDeer)
        theta_f = 0.85, beta_ffy = 0.02, beta_mf = 0.1, beta_mm = 0.6, 
        kappa_NF_y = 20, kappa_EF_y = 15, sigma_abund = 0.1)
   
-  sim_realdata <- runModel_sim(p0, Tmx = 4,
+  sim_realdata <- runModel_sim(p0, Tmx = 100,
                                initial_data = subset(full_data, year == 2014),
                                M_distance   = M_distance,
                                init_year    = 2014)
-  
-  
   
   ## ---- Layer 4: expand and map -------------------------------------------
   ## expand_output() adds aggregate counts, proportions, and wolf_presence.
@@ -56,5 +54,58 @@ library(ChronicWolfDeer)
   mapResults_cwd(sim_expanded, sim_year = 4)                 # total prevalence
   mapResults_cwd(sim_expanded, sim_year = 4, sex = "male", age = "adult")
   mapResults_wtd(sim_expanded, sim_year = 4)                 # total abundance
+  
+  
+  
+  
+  
+  
+  library(plotly)
+  
+  # helper: one scatter trace per county, observed x, simulated y
+  make_plot <- function(df, x_col, y_col, ylab) {
+    counties <- unique(df$county)
+    p <- plot_ly()
+    for (co in counties) {
+      d <- df[df$county == co, ]
+      d <- d[order(d$year), ]
+      p <- add_trace(p,
+                     data = d,
+                     x = ~get(x_col), y = ~get(y_col),
+                     type = "scatter", mode = "lines+markers",
+                     name = co,
+                     text = ~as.character(year),
+                     hovertemplate = paste0(co, "<br>year: %{text}<br>obs: %{x}<br>sim: %{y}<extra></extra>"),
+                     line = list(width = 1),
+                     marker = list(size = ~(year - min(df$year) + 1) * 2),
+                     showlegend = FALSE
+      )
+    }
+    p |> layout(
+      xaxis = list(title = "Observed"),
+      yaxis = list(title = ylab),
+      hovermode = "closest"
+    )
+  }
+  
+  plot_df$N_sim   <- plot_df$I_all_sim + plot_df$S_all_sim
+  plot_df$I_obs   <- plot_df$prop_cwd * plot_df$wtd_count
+  plot_df$p_sim   <- plot_df$I_all_sim / plot_df$N_sim
+  
+  # -- sex/age subsets --
+  # male adults
+  plot_df$N_sim_ma  <- plot_df$IMA_sim + plot_df$SMA_sim
+  plot_df$N_sim_fa  <- plot_df$IFA_sim + plot_df$SFA_sim
+  plot_df$N_sim_my  <- plot_df$IMY_sim + plot_df$SMY_sim
+  plot_df$N_sim_fy  <- plot_df$IFY_sim + plot_df$SFY_sim
+  
+  # three main plots
+  p_total    <- make_plot(plot_df, "wtd_count", "N_sim",    "Total (sim)")
+  p_infected <- make_plot(plot_df, "I_obs",     "I_all_sim","Infected (sim)")
+  p_prev     <- make_plot(plot_df, "prop_cwd",  "p_sim",    "Prevalence (sim)")
+  
+  p_total
+  p_infected
+  p_prev
   
   

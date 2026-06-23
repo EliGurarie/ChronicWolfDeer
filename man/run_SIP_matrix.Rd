@@ -11,23 +11,27 @@ run_SIP_matrix(init_data, parameters, Tmax, M_distance, ...)
 \code{I.F.Y0}), rate columns, and context columns (\code{county}, \code{dnr_region},
 \code{wolf_presence}, \code{wolf_abundance}, \code{K}).}
 
-\item{parameters}{Raw-scale parameter list (passed as \code{p}).}
+\item{parameters}{Raw-scale parameter list (passed as \code{p}; must include
+\code{kappa_NF_y} and \code{kappa_EF_y} for the dispersal kernel).}
 
 \item{Tmax}{Number of years to simulate (>= 2); year 1 is the seed.}
 
 \item{M_distance}{Square county-by-county distance matrix, ordered to match
 \code{init_data$county}.}
 
-\item{...}{Forwarded to \code{step_SIP_matrix()} (e.g. \code{classes}).}
+\item{...}{Forwarded to \code{\link[=step_SIP_matrix]{step_SIP_matrix()}} (e.g. \code{classes}).}
 }
 \value{
 A list of eight counties-by-\code{Tmax} matrices plus \code{data} (the input).
 }
 \description{
 Seeds the eight class matrices from \code{init_data} (year 1) and advances them
-with \code{step_SIP_matrix()} for \code{Tmax} years. County order is taken from
-\code{init_data$county}. This is where per-county data columns are unpacked from
-the data frame and handed to the annual step; \code{...} (e.g. \code{classes}) is
-forwarded through.
+with \code{\link[=step_SIP_matrix]{step_SIP_matrix()}} for \code{Tmax} years. County order is taken from
+\code{init_data$county}. Per-county data columns are unpacked here and handed to
+the annual step.
+}
+\details{
+The dispersal kernel is constant across years, so it is built once (via
+\code{\link[=calculate_prob_dispersal]{calculate_prob_dispersal()}}) and reused every step rather than rebuilt.
 }
 \keyword{internal}
