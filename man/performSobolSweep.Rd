@@ -42,7 +42,6 @@ of \code{rownames(bounds)}), and returns the design plus log-likelihoods sorted
 best-first.
 }
 \examples{
-unloadNamespace("ChronicWolfDeer")
 library(ChronicWolfDeer)
 library(randtoolbox)
 library(future.apply)

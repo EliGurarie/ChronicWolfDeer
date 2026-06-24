@@ -1,4 +1,3 @@
-unloadNamespace("ChronicWolfDeer")
 library(ChronicWolfDeer)
 library(randtoolbox)
 library(future.apply)
