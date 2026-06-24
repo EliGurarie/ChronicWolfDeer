@@ -316,7 +316,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 #' @return A data frame: eight class counts (`SMA_sim` ... `IFY_sim`),
 #'   `I_all_sim`, `S_all_sim`, `county`, `sim_year`, `year`. `NULL` on failure.
 #' @export
-#' @example man/examples/example_run_SIP.R
+#' @example examples/example_run_SIP.R
 run_SIP <- function(parameters, n_years, data_list, ...) {
   if (!is.numeric(n_years) || n_years < 2)
     stop("run_SIP: n_years must be an integer >= 2.")

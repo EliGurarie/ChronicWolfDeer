@@ -157,7 +157,7 @@ setupSobol <- function(bounds, N) {
 #' @param parallel Use [future.apply::future_sapply()]? Default `TRUE`.
 #' @return Data frame of `N` rows: fitted parameter columns + `loglik`, sorted
 #'   descending by `loglik`.
-#' @examples man/examples/example_Sobol_sweep.R
+#' @example examples/example_Sobol_sweep.R
 #' @export
 performSobolSweep <- function(bounds, pars_to_fit, p0, data_lists, N,
                               w = 0.5, parallel = TRUE) {
