@@ -1,24 +1,16 @@
 library(ChronicWolfDeer)
 
-## ---- Layer 1: one annual step (internal engine) -------------------------
-## step_SIP_matrix() advances a single year. Not normally called directly;
-## shown here to illustrate the bottom of the stack.
-
-## ---- Layer 2: several years on toy data ---------------------------------
-## run_SIP_matrix() iterates the step. Also internal; runModel_sim() wraps it.
-
-## ---- Layer 3: runModel_sim() -- the function you call -------------------
 
 # Toy data
   toy <- make_toy_sip_data(n_counties = 5, n_years = 4, seed = 1)
   
-  sim <- runModel_sim(toy$parameters, Tmx = 4,
+  sim <- run_SIP(toy$parameters, Tmax = 4,
                       initial_data = toy$init_data,
                       M_distance   = toy$M_distance,
                       init_year    = 2014)
   head(sim)
 
-# Load real data
+# Real Data
 
   data(full_data)
   data("county_borders")
@@ -40,7 +32,7 @@ library(ChronicWolfDeer)
        theta_f = 0.85, beta_ffy = 0.02, beta_mf = 0.1, beta_mm = 0.6, 
        kappa_NF_y = 20, kappa_EF_y = 15, sigma_abund = 0.1)
   
-  sim_realdata <- runModel_sim(p0, Tmx = 100,
+  sim_realdata <- run_SIP(p0, Tmax = 100,
                                initial_data = subset(full_data, year == 2014),
                                M_distance   = M_distance,
                                init_year    = 2014)
@@ -88,6 +80,10 @@ library(ChronicWolfDeer)
     )
   }
   
+  plot_df <- merge(sim_realdata, full_data, by = c("year", "county"))
+  plot_df$wtd_count_sim <- plot_df$I_all_sim + plot_df$S_all_sim
+  
+  
   plot_df$N_sim   <- plot_df$I_all_sim + plot_df$S_all_sim
   plot_df$I_obs   <- plot_df$prop_cwd * plot_df$wtd_count
   plot_df$p_sim   <- plot_df$I_all_sim / plot_df$N_sim
@@ -107,5 +103,4 @@ library(ChronicWolfDeer)
   p_total
   p_infected
   p_prev
-  
   

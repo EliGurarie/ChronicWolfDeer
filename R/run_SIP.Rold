@@ -384,7 +384,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 #' Run the Wolf-CWD SIP model
 #'
 #' Simulates white-tailed deer demography and chronic wasting disease dynamics
-#' across Wisconsin counties for `Tmx` years, starting from `initial_data`.
+#' across Wisconsin counties for `Tmax` years, starting from `initial_data`.
 #' Returns one tidy row per county per simulated year.
 #'
 #' This is the user-facing entry point for model runs. It drives an internal
@@ -397,7 +397,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 #'   `theta_f` (infected-adult survival multipliers), `beta_mm`, `beta_mf`,
 #'   `beta_ffy` (transmission rates), `kappa_NF_y`, `kappa_EF_y` (dispersal
 #'   kernel scales for North / South).
-#' @param Tmx Number of years to simulate (>= 2). Year 1 holds the seed values.
+#' @param Tmax Number of years to simulate (>= 2). Year 1 holds the seed values.
 #' @param initial_data One row per county with the seed counts (`S.M.A0` ...
 #'   `I.F.Y0`), mortality/recruitment rates, and context columns (`county`,
 #'   `dnr_region`, `wolf_presence`, `wolf_abundance`, `K`). The `full_data`
@@ -414,17 +414,17 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 #'   `sim_year`, and `year`. `NULL` if the simulation failed.
 #'
 #' @export
-#' @example man/examples/example_runModel_sim.R
-runModel_sim <- function(parameters, Tmx, initial_data, M_distance,
+#' @example man/examples/example_run_SIP.R
+run_SIP <- function(parameters, Tmax, initial_data, M_distance,
                          init_year = 2014, ...) {
   if (!is.data.frame(initial_data) || nrow(initial_data) == 0)
     stop("runModel_sim: initial_data must be provided and non-empty.")
-  if (!is.numeric(Tmx) || Tmx < 1)
-    stop("runModel_sim: Tmx must be a positive integer.")
+  if (!is.numeric(Tmax) || Tmax < 1)
+    stop("runModel_sim: Tmax must be a positive integer.")
   
   myfit <- tryCatch(
     run_SIP_matrix(init_data = initial_data, parameters = parameters,
-                   Tmax = Tmx, M_distance = M_distance, ...),
+                   Tmax = Tmax, M_distance = M_distance, ...),
     error = function(e) {
       warning("runModel_sim: run_SIP_matrix failed: ", conditionMessage(e))
       NULL
@@ -432,8 +432,8 @@ runModel_sim <- function(parameters, Tmx, initial_data, M_distance,
   )
   if (is.null(myfit)) return(NULL)
   
-  result_list <- vector("list", length = Tmx)
-  for (t in seq_len(Tmx)) {
+  result_list <- vector("list", length = Tmax)
+  for (t in 1:Tmax) {
     SMA <- myfit$S.M.A[, t]; SFA <- myfit$S.F.A[, t]
     SMY <- myfit$S.M.Y[, t]; SFY <- myfit$S.F.Y[, t]
     IMA <- myfit$I.M.A[, t]; IFA <- myfit$I.F.A[, t]
@@ -446,7 +446,7 @@ runModel_sim <- function(parameters, Tmx, initial_data, M_distance,
       S_all_sim = SMA + SFA + SMY + SFY,
       county   = initial_data$county,
       sim_year = t,
-      year     = init_year + t,
+      year     = init_year + t - 1,
       stringsAsFactors = FALSE
     )
   }
