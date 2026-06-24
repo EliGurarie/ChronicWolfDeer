@@ -43,6 +43,4 @@ summarising, or app display: \verb{runModel_sim() |> expand_output() |> ...}.
 }
 \seealso{
 \code{\link[=mapResults_cwd]{mapResults_cwd()}}, \code{\link[=mapResults_wtd]{mapResults_wtd()}}
-
-\code{\link[=mapResults_cwd]{mapResults_cwd()}}, \code{\link[=mapResults_wtd]{mapResults_wtd()}}
 }

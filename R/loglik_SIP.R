@@ -119,3 +119,57 @@ calc_logLik_SIP_all <- function(p_fit, p_base, pars_to_fit, data_lists, w = 0.5)
   sum(sapply(data_lists, calc_logLik_SIP,
              p_fit = p_fit, p_base = p_base, pars_to_fit = pars_to_fit, w = w))
 }
+
+
+#' Set up a Sobol' design matrix
+#'
+#' @param bounds Data frame with `lower`, `upper`, `log` columns and parameter
+#'   names as row names.
+#' @param N Number of Sobol' points.
+#' @return Numeric matrix of `N` rows scaled to the parameter ranges.
+#' @export
+setupSobol <- function(bounds, N) {
+  u  <- randtoolbox::sobol(N, dim = nrow(bounds))
+  lo <- ifelse(bounds$log, log(bounds$lower), bounds$lower)
+  hi <- ifelse(bounds$log, log(bounds$upper), bounds$upper)
+  X  <- sweep(sweep(u, 2, hi - lo, "*"), 2, lo, "+")
+  X[, bounds$log] <- exp(X[, bounds$log])
+  colnames(X) <- rownames(bounds)
+  X
+}
+
+
+#' Run a parallelised Sobol' likelihood sweep
+#'
+#' Builds a Sobol' design over `bounds`, evaluates [calc_logLik_SIP_all()] at
+#' each point for the parameters named in `pars_to_fit` (which must be a subset
+#' of `rownames(bounds)`), and returns the design plus log-likelihoods sorted
+#' best-first.
+#'
+#' @param bounds Data frame with `lower`, `upper`, `log` and parameter names as
+#'   row names. May cover more parameters than `pars_to_fit`.
+#' @param pars_to_fit Character vector of parameter names to fit (subset of
+#'   `rownames(bounds)`).
+#' @param p0 Baseline parameter list.
+#' @param data_lists Output of [prep_data_all()].
+#' @param N Number of Sobol' points.
+#' @param w Weight on growth vs prevalence term. Default 0.5.
+#' @param parallel Use [future.apply::future_sapply()]? Default `TRUE`.
+#' @return Data frame of `N` rows: fitted parameter columns + `loglik`, sorted
+#'   descending by `loglik`.
+#' @examples man/examples/example_Sobol_sweep.R
+#' @export
+performSobolSweep <- function(bounds, pars_to_fit, p0, data_lists, N,
+                              w = 0.5, parallel = TRUE) {
+  X <- setupSobol(subset(bounds, rownames(bounds) %in% pars_to_fit), N)
+  
+  f <- function(i)
+    calc_logLik_SIP_all(setNames(as.list(X[i, ]), pars_to_fit),
+                        p0, pars_to_fit, data_lists, w)
+  
+  ll <- if (parallel) future.apply::future_sapply(seq_len(N), f, future.seed = NULL)
+  else sapply(seq_len(N), f)
+  
+  res <- data.frame(X, loglik = ll)
+  res[order(-res$loglik), ]
+}

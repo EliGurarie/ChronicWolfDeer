@@ -22,8 +22,8 @@ to the raw scale. Transformed aliases are recognised by name prefix:
 }
 \details{
 \itemize{
-\item \verb{log_<base>}    -> back-transformed with \code{\link[base:Log]{base::exp()}}
-\item \verb{qlogis_<base>} -> back-transformed with \code{\link[stats:Logistic]{stats::plogis()}}
+\item \verb{log_<base>}    -> back-transformed with \code{\link[base:exp]{base::exp()}}
+\item \verb{qlogis_<base>} -> back-transformed with \code{\link[stats:plogis]{stats::plogis()}}
 }
 
 The lookup order is raw, then \code{log_}, then \code{qlogis_}.

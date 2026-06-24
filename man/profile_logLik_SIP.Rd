@@ -15,7 +15,7 @@ profile_logLik_SIP(par, values, p_base, data_lists, w = 0.5, parallel = FALSE)
 
 \item{data_lists}{Output of \code{\link[=prep_data_all]{prep_data_all()}}.}
 
-\item{parallel}{Evaluate in parallel via \code{\link[future.apply:future_lapply]{future.apply::future_sapply()}}?
+\item{parallel}{Evaluate in parallel via \code{\link[future.apply:future_sapply]{future.apply::future_sapply()}}?
 Requires a \code{future::plan()}. Default \code{FALSE}.}
 }
 \value{
@@ -26,5 +26,5 @@ Sweeps a single parameter across \code{values}, holding all others at \code{p_ba
 and returns the log-likelihood summed over all year-pairs at each value. Use
 to see whether the data constrain a parameter (curved profile with a peak)
 or not (flat). Evaluations are independent and run in parallel via
-\code{\link[future.apply:future_lapply]{future.apply::future_sapply()}}.
+\code{\link[future.apply:future_sapply]{future.apply::future_sapply()}}.
 }
