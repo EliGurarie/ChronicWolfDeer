@@ -112,8 +112,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 
   LeslieArray <- array(0, dim = c(n.classes, n.classes, n.sites),
                        dimnames = list(classes, classes, counties))
-
-  rho <- (mean_wtd_fdr / 2)
+  rho <- (mean_wtd_fdr / 2) * p$tau
 
   ## 1.3 Predation softmax weights (vectorized)
   pref <- exp(is_inf * log(p$alpha) + is_male * log(p$xi) + is_yrlg * log(p$eta))
