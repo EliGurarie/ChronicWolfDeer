@@ -164,6 +164,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
   phi_matrix[is.infinite(phi_matrix)] <- 1
 
   ## 1.7 Fill the Lefkovitch entries
+  
   LeslieArray["s.m.y", "s.f.a", ] <- pmin(pmax(rho * phi_fty_male, 0.00001), 0.99)
   LeslieArray["s.m.a", "s.m.y", ] <- phi_matrix[, "s.m.y"]
   LeslieArray["s.m.a", "s.m.a", ] <- phi_matrix[, "s.m.a"]
@@ -171,15 +172,16 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
   LeslieArray["s.f.a", "s.f.y", ] <- phi_matrix[, "s.f.y"]
   LeslieArray["s.f.a", "s.f.a", ] <- phi_matrix[, "s.f.a"]
 
-  LeslieArray["s.m.y", "i.f.a", ] <- pmin(pmax(rho * phi_fty_male, 0.00001), 0.99)
-  LeslieArray["s.f.y", "i.f.a", ] <- pmin(pmax(rho * phi_fty_female, 0.00001), 0.99)
-  LeslieArray["i.m.y", "i.f.a", ] <- 0
+  # all infected females infect their young  
+  LeslieArray["i.m.y", "i.f.a", ] <- pmin(pmax(rho * phi_fty_male,   0.00001), 0.99)
+  LeslieArray["i.f.y", "i.f.a", ] <- pmin(pmax(rho * phi_fty_female, 0.00001), 0.99)
+  
   LeslieArray["i.m.a", "i.m.y", ] <- phi_matrix[, "i.m.y"]
   LeslieArray["i.m.a", "i.m.a", ] <- phi_matrix[, "i.m.a"]
-  LeslieArray["i.f.y", "i.f.a", ] <- 0
   LeslieArray["i.f.a", "i.f.y", ] <- phi_matrix[, "i.f.y"]
   LeslieArray["i.f.a", "i.f.a", ] <- phi_matrix[, "i.f.a"]
 
+  
   ## 1.8 Beverton-Holt density correction, then project
   PopMatrix.postLeslie <- matrix(NA_real_, nrow = n.sites, ncol = n.classes,
                                  dimnames = list(counties, classes))
@@ -233,30 +235,44 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
     old_pop <- old_infected + sum(pop_vec[susc])
 
     if (old_pop > 0) {
-      I_prop <- pop_vec[infs] / old_pop
-      P.infected <- as.vector(TransmissionMatrix %*% I_prop)
-    } else {
-      P.infected <- rep(0, length(susc))
-    }
-    if (any(P.infected < 0 | P.infected > 1)) {
-      warning("Invalid P.infected values; clamping applied")
+      # explicit assignment for my sanity
+      I_vec <- c("m.a" = pop_vec["i.m.a"],
+                 "f.a" = pop_vec["i.f.a"],
+                 "m.y" = pop_vec["i.m.y"],
+                 "f.y" = pop_vec["i.f.y"])
+      I_prop <- I_vec / old_pop
+      
+      S_vec <- c(pop_vec["s.m.a"],
+                 pop_vec["s.f.a"],
+                 pop_vec["s.m.y"],
+                 pop_vec["s.f.y"])
+      
+      # FOI (or "per-year infection probability proxy" in the deterministic implementation)
+      # TransmissionMatrix: rows=target, cols=source
+      # Convert rate to probability using  discrete-time formula
+      # P(infection) = 1 - exp(-rate), which is exact for a Poisson process
+      rate_of_infection <- as.vector(TransmissionMatrix %*% I_prop)   # force-of-infection rate
+      P.infected <- 1 - exp(-rate_of_infection)
+      
+      # Clamp to [0,1] (exp formula guarantees [0,1) but be defensive)
       P.infected <- pmin(pmax(P.infected, 0), 1)
-    }
-
-    S_vec <- pop_vec[susc]
-    new_infected <- pmin(P.infected * S_vec, S_vec)
-
-    allowed_new_infections <- max(0, 0.99 * old_pop - old_infected)
-    if (sum(new_infected) > allowed_new_infections && sum(new_infected) > 0) {
-      new_infected <- new_infected * (allowed_new_infections / sum(new_infected))
-    }
-
-    InfectionShuffle[, , c] <- 0
-    InfectionShuffle[infs, infs, c] <- diag(1, length(infs))
-    for (k in seq_along(susc)) {
-      p_inf <- if (S_vec[k] > 0) pmin(pmax(new_infected[k] / S_vec[k], 0), 1) else 0
-      InfectionShuffle[susc[k], infs[k], c] <- p_inf
-      InfectionShuffle[susc[k], susc[k], c] <- 1 - p_inf
+      
+      
+      new_infected <- P.infected * S_vec
+      new_infected <- pmin(new_infected, S_vec)
+      
+      allowed_new_infections <- max(0, 0.99 * old_pop - old_infected)
+      if (sum(new_infected) > allowed_new_infections && sum(new_infected) > 0) {
+        new_infected <- new_infected * (allowed_new_infections / sum(new_infected))
+      }
+  
+      InfectionShuffle[, , c] <- 0
+      InfectionShuffle[infs, infs, c] <- diag(1, length(infs))
+      for (k in seq_along(susc)) {
+        p_inf <- if (S_vec[k] > 0) pmin(pmax(new_infected[k] / S_vec[k], 0), 1) else 0
+        InfectionShuffle[susc[k], infs[k], c] <- p_inf
+        InfectionShuffle[susc[k], susc[k], c] <- 1 - p_inf
+      }
     }
   }
 
