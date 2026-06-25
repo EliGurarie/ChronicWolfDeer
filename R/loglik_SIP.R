@@ -67,7 +67,9 @@ loglik_SIP <- function(comp, zeta = 0.16, w = 0.5, eps = 1e-6) {
 calc_logLik_SIP <- function(p_fit, p_base, pars_to_fit, data_list, w = 0.5) {
   p <- p_base
   p[pars_to_fit] <- p_fit[pars_to_fit]
-  
+  p$beta_mf <- p$beta_ffy * p$C_betamf
+  p$beta_mm <- p$beta_ffy * p$C_betamm
+
   sim <- tryCatch(run_SIP(p, n_years = 2, data_list),
                   error = function(e) NULL)
   if (is.null(sim)) return(-1e10)
