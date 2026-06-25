@@ -123,3 +123,29 @@ coerce_to_raw_params <- function(params) {
 
   Filter(Negate(is.null), out)
 }
+
+
+
+
+#' Obtain parameters from fitted set
+#'
+#' Takes a baseline parameter list and one row of fitted values (e.g. the best
+#' row of a Sobol' sweep), overlays the fitted parameters, derives `beta_mf`
+#' and `beta_mm` from their multipliers, and returns a parameter list ready for
+#' [run_SIP()].
+#'
+#' @param p0 Baseline parameter list.
+#' @param fit One-row data frame (or named vector) of fitted values. Diagnostic
+#'   columns (`loglik`, `delta_ll`) and the `C_*` multipliers are dropped after
+#'   use.
+#' @return A parameter list for [run_SIP()].
+#' @export
+format_parameters <- function(p0, fit) {
+  fit <- as.list(fit)
+  p <- modifyList(as.list(p0), fit)
+  p$beta_mf <- p$beta_ffy * p$C_betamf
+  p$beta_mm <- p$beta_ffy * p$C_betamm
+  p[c("C_betamf", "C_betamm", "loglik", "delta_ll")] <- NULL
+  p
+}
+
