@@ -7,11 +7,11 @@
 #'
 #' The typical workflow is:
 #'
-#' 1. Assemble a county-year data frame (see [make_toy_sip_data()] for the
+#' 1. Assemble a county-year data frame (see `make_toy_sip_data()` for the
 #'    required column layout).
 #' 2. Iterate the model with [run_SIP_matrix()] (single seed year) or the
-#'    higher-level wrappers [runModel_sim()].
-#' 3. Reshape the matrix output with [output_transform()].
+#'    higher-level wrappers [run_SIP()].
+#' 3. Reshape the matrix output with `output_transform()`.
 #'
 #' The one-step engine [step_SIP_matrix()] is exposed for testing and for
 #' users who want to drive the projection manually.

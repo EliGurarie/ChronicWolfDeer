@@ -23,6 +23,7 @@ step_SIP_matrix(
   phi_fty_male,
   phi_fty_female,
   K,
+  area,
   W,
   n.wolf,
   p,
@@ -42,7 +43,7 @@ step_SIP_matrix(
 
 \item{phi_fty_male, phi_fty_female}{Fawn-to-yearling survival probabilities.}
 
-\item{K}{Carrying capacities. \code{W} Wolf presence. \code{n.wolf} Wolf abundance.}
+\item{K}{Carrying capacities. \code{area} County area (km2). \code{W} Wolf presence. \code{n.wolf} Wolf abundance.}
 
 \item{p}{Raw-scale parameter list (\code{alpha}, \code{xi}, \code{eta}, \code{omega}, \code{theta_m},
 \code{theta_f}, \code{beta_mm}, \code{beta_mf}, \code{beta_ffy}).}

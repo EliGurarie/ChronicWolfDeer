@@ -52,6 +52,7 @@ run_SIP_matrix <- function(parameters, n_years, data_list, ...) {
       W                = d$wolf_presence,
       n.wolf           = d$wolf_abundance,
       K                = d$K,
+      area             = d$area,
       counties         = counties,
       classes          = data_list$classes,
       ...
@@ -81,7 +82,9 @@ run_SIP_matrix <- function(parameters, n_years, data_list, ...) {
 #' @param nh_mu_adult_other,nh_mu_yearling_other,nh_mu_adult_human,nh_mu_yearling_human
 #'   Non-harvest mortality rates.
 #' @param phi_fty_male,phi_fty_female Fawn-to-yearling survival probabilities.
-#' @param K Carrying capacities. `W` Wolf presence. `n.wolf` Wolf abundance.
+#' @param K Carrying capacities. `area` County area (km2). `W` Wolf presence. `n.wolf` Wolf abundance.
+#' @param p Raw-scale parameter list (`alpha`, `xi`, `eta`, `omega`, `theta_m`,
+#'   `theta_f`, `beta_mm`, `beta_mf`, `beta_ffy`; optional `D_s`).
 #' @param p Raw-scale parameter list (`alpha`, `xi`, `eta`, `omega`, `theta_m`,
 #'   `theta_f`, `beta_mm`, `beta_mf`, `beta_ffy`).
 #' @param dispersal_matrix Prebuilt row-stochastic dispersal matrix.
@@ -95,7 +98,7 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
                             nh_mu_adult_other, nh_mu_yearling_other,
                             nh_mu_adult_human, nh_mu_yearling_human,
                             phi_fty_male, phi_fty_female,
-                            K, W, n.wolf, p,
+                            K, area, W, n.wolf, p,
                             dispersal_matrix, counties,
                             classes = sip_classes) {
 
@@ -120,10 +123,12 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
   weights <- PopMatrix0 * matrix(pref, n.sites, n.classes, byrow = TRUE)
   prop_pred_class <- weights / (rowSums(weights) + 1e-12)
 
-  max.tot  <- ifelse(as.logical(W), p$omega * n.wolf, 0)
-  capped   <- pmin(max.tot, rowSums(PopMatrix0) * 0.75)
+  D       <- rowSums(PopMatrix0) / area                                  # deer / km2
+  D_s     <- if (is.null(p$D_s)) 1 else p$D_s                            # switching density, deer/km2
+  f_deer  <- D^2 / (D^2 + D_s^2)  
+  max.tot <- ifelse(as.logical(W), p$omega * n.wolf * f_deer, 0)
 
-  prop.predated.byclass.all <- pmin((capped * prop_pred_class) / pmax(PopMatrix0, 1e-12), 0.75)
+  prop.predated.byclass.all <- pmin((max.tot * prop_pred_class) / pmax(PopMatrix0, 1e-12), 0.75)
   prop.predated.byclass.all[!is.finite(prop.predated.byclass.all)] <- 0
   dimnames(prop.predated.byclass.all) <- list(counties, classes)
 
@@ -324,7 +329,9 @@ step_SIP_matrix <- function(s.m.a, s.f.a, i.m.a, i.f.a,
 #' county per simulated year.
 #'
 #' @param parameters Raw-scale parameter list. Required: `alpha`, `xi`, `eta`,
-#'   `omega`, `theta_m`, `theta_f`, `beta_mm`, `beta_mf`, `beta_ffy`.
+#'   `omega`, `theta_m`, `theta_f`, `beta_mm`, `beta_mf`, `beta_ffy`, 
+#'   Optional: `D_s`, switching density (deer/km^2) for the type III wolf
+#'   functional response; default 1 deer/km².
 #' @param n_years Number of years to simulate (>= 2). Year 1 is the seed.
 #' @param data_list Output of [prep_data()].
 #' @param ... Advanced: forwarded to the engine.

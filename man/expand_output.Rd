@@ -7,7 +7,7 @@
 expand_output(sim)
 }
 \arguments{
-\item{sim}{A data frame from \code{\link[=runModel_sim]{runModel_sim()}}, containing \code{SMA_sim} ...
+\item{sim}{A data frame from \code{\link[=run_SIP]{run_SIP()}}, containing \code{SMA_sim} ...
 \code{IFY_sim}, \code{county}, \code{sim_year}, and \code{year}.}
 }
 \value{
@@ -17,7 +17,7 @@ proportions (e.g. \code{ima_sim_perc}, \code{i_all_sim_perc}), and a logical
 \code{wolf_presence} column.
 }
 \description{
-Takes the output of \code{\link[=runModel_sim]{runModel_sim()}} (one row per county per simulated year,
+Takes the output of \code{\link[=run_SIP]{run_SIP()}} (one row per county per simulated year,
 with the eight \verb{*_sim} class counts) and adds the aggregate counts and
 within-group proportions used for plotting and exploration, plus a
 \code{wolf_presence} flag joined from \link{wolf_density_by_county}.

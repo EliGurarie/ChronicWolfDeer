@@ -8,7 +8,9 @@ run_SIP(parameters, n_years, data_list, ...)
 }
 \arguments{
 \item{parameters}{Raw-scale parameter list. Required: \code{alpha}, \code{xi}, \code{eta},
-\code{omega}, \code{theta_m}, \code{theta_f}, \code{beta_mm}, \code{beta_mf}, \code{beta_ffy}.}
+\code{omega}, \code{theta_m}, \code{theta_f}, \code{beta_mm}, \code{beta_mf}, \code{beta_ffy},
+Optional: \code{D_s}, switching density (deer/km^2) for the type III wolf
+functional response; default 1 deer/km².}
 
 \item{n_years}{Number of years to simulate (>= 2). Year 1 is the seed.}
 

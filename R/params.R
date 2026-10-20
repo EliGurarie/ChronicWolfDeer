@@ -78,7 +78,7 @@ get_raw_param <- function(params, base) {
 #' recognised and would be carried forward under their transformed name. Extend
 #' `base_names` if you intend to fit those on a transformed scale. This helper
 #' is provided as a standalone utility; the simulation wrappers
-#' ([runModel_sim()]) currently expect raw-scale input
+#' ([run_SIP()]) currently expect raw-scale input
 #' and do not call it automatically.
 #'
 #' @param params A named list or named numeric vector of parameters, possibly

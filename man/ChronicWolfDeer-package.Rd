@@ -14,11 +14,11 @@ model.
 \details{
 The typical workflow is:
 \enumerate{
-\item Assemble a county-year data frame (see \code{\link[=make_toy_sip_data]{make_toy_sip_data()}} for the
+\item Assemble a county-year data frame (see \code{make_toy_sip_data()} for the
 required column layout).
 \item Iterate the model with \code{\link[=run_SIP_matrix]{run_SIP_matrix()}} (single seed year) or the
-higher-level wrappers \code{\link[=runModel_sim]{runModel_sim()}}.
-\item Reshape the matrix output with \code{\link[=output_transform]{output_transform()}}.
+higher-level wrappers \code{\link[=run_SIP]{run_SIP()}}.
+\item Reshape the matrix output with \code{output_transform()}.
 }
 
 The one-step engine \code{\link[=step_SIP_matrix]{step_SIP_matrix()}} is exposed for testing and for

@@ -1,6 +1,6 @@
 #' Expand simulation output into per-class counts, proportions, and wolf presence
 #'
-#' Takes the output of [runModel_sim()] (one row per county per simulated year,
+#' Takes the output of [run_SIP()] (one row per county per simulated year,
 #' with the eight `*_sim` class counts) and adds the aggregate counts and
 #' within-group proportions used for plotting and exploration, plus a
 #' `wolf_presence` flag joined from [wolf_density_by_county].
@@ -8,7 +8,7 @@
 #' This is the bridge between a raw model run and any downstream plotting,
 #' summarising, or app display: `runModel_sim() |> expand_output() |> ...`.
 #'
-#' @param sim A data frame from [runModel_sim()], containing `SMA_sim` ...
+#' @param sim A data frame from [run_SIP()], containing `SMA_sim` ...
 #'   `IFY_sim`, `county`, `sim_year`, and `year`.
 #'
 #' @return `sim` with renamed dotted class columns (`S.M.A` ... `I.F.Y`), all

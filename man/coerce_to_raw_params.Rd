@@ -34,7 +34,7 @@ the pass-through parameters (for example \code{qlogis_theta_m}) are \strong{not}
 recognised and would be carried forward under their transformed name. Extend
 \code{base_names} if you intend to fit those on a transformed scale. This helper
 is provided as a standalone utility; the simulation wrappers
-(\code{\link[=runModel_sim]{runModel_sim()}}) currently expect raw-scale input
+(\code{\link[=run_SIP]{run_SIP()}}) currently expect raw-scale input
 and do not call it automatically.
 }
 

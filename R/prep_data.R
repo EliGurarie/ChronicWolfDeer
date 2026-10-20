@@ -12,6 +12,10 @@
 #'   `classes`, `full_data`.
 #' @export
 prep_data <- function(full_data, year1, kappas, M_distance) {
+  
+  if (stats::median(M_distance[M_distance > 0]) > 1000)
+    warning("M_distance looks like metres; kappa is in km.")
+  
   data_year1 <- subset(full_data, year == year1)
 
   dispersal_matrix <- calculate_prob_dispersal(

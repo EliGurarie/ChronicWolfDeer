@@ -175,3 +175,37 @@ performSobolSweep <- function(bounds, pars_to_fit, p0, data_lists, N,
   res <- data.frame(X, loglik = ll)
   res[order(-res$loglik), ]
 }
+
+
+#' Goodness of fit of a simulation to observed data
+#'
+#' Computes the coefficient of determination of simulated against observed
+#' county-year values, for total deer abundance and CWD prevalence. R^2 is
+#' measured against the 1:1 line, \eqn{R^2 = 1 - SS_{res} / SS_{tot}}, not as
+#' a squared correlation, so systematic bias lowers it and it can be negative
+#' when the simulation does worse than the observed mean. The seed year
+#' (`sim_year == 1`) is excluded, since the simulation starts from the
+#' observed values there.
+#'
+#' @param sim Output of [run_SIP()], run from a year present in [full_data]
+#'   (e.g. 2014) for the years to be compared.
+#' @return Named numeric vector with elements `abundance` (simulated vs
+#'   observed `wtd_count`) and `prevalence` (simulated vs observed
+#'   `prop_cwd`). County-years with missing observed values are dropped.
+#' @seealso [plot_fit()], [plotly_results()], [run_SIP()]
+#' @examples
+#' \dontrun{
+#' data_list <- prep_data(full_data, 2014, c(kappa_NF_y = 10, kappa_EF_y = 6.5), M_distance)
+#' fit_R2(run_SIP(p_best, n_years = 9, data_list))
+#' }
+#' @export
+fit_R2 <- function(sim) {
+  d <- merge(subset(sim, sim_year > 1), full_data, by = c("year", "county"))
+  d$N_sim <- d$I_all_sim + d$S_all_sim
+  d$p_sim <- d$I_all_sim / d$N_sim
+  r2 <- function(obs, pred) {
+    ok <- !is.na(obs) & !is.na(pred)
+    1 - sum((obs[ok] - pred[ok])^2) / sum((obs[ok] - mean(obs[ok]))^2)
+  }
+  c(abundance = r2(d$wtd_count, d$N_sim), prevalence = r2(d$prop_cwd, d$p_sim))
+}
